@@ -1,0 +1,3 @@
+from Migrations.email_logs_table import create_emails_table
+
+create_emails_table()
