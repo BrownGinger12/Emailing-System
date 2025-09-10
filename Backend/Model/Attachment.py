@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from docx import Document
+import os
 
 
 class Attachment(BaseModel):
@@ -69,6 +70,8 @@ class Attachment(BaseModel):
                         for placeholder, value in replacements.items():
                             if placeholder in cell.text:
                                 cell.text = cell.text.replace(placeholder, value)
+            
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
             doc.save(output_path)
 

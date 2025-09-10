@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Mail } from "lucide-react";
-import { auth, provider } from "../Firebase/firebase";
+import { auth, db, provider } from "../Firebase/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useAuth } from "../contexts/AuthContext";
+import { doc, getDoc } from "firebase/firestore";
 
 interface LoginPageProps {}
 
@@ -10,7 +11,6 @@ const LoginPage: React.FC<LoginPageProps> = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { currentUser } = useAuth();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (currentUser) {
       // User is already logged in, no need to show login page
@@ -21,8 +21,21 @@ const LoginPage: React.FC<LoginPageProps> = () => {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      await signInWithPopup(auth, provider);
-      // Success message will be handled by AuthContext
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      if (!user?.email) {
+        throw new Error("No email found in Google account");
+      }
+
+      const docRef = doc(db, "allowLogin", user.email);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        await auth.signOut();
+        alert("Your account is not allowed to log in.");
+        return;
+      }
     } catch (error: any) {
       alert("Google sign-in failed: " + error.message);
     } finally {
@@ -40,7 +53,9 @@ const LoginPage: React.FC<LoginPageProps> = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4">
               <Mail className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">MailHub</h1>
+            <h1 className="text-3xl font-bold text-blue-900 mb-2">
+              Deped Cadiz
+            </h1>
             <p className="text-blue-600">Sign in to your email dashboard</p>
           </div>
           {/* Google Login Button */}
@@ -88,19 +103,6 @@ const LoginPage: React.FC<LoginPageProps> = () => {
               Your data is protected and never shared
             </p>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-blue-600 text-sm">
-            Need help?{" "}
-            <a
-              href="#"
-              className="text-blue-500 hover:text-blue-700 font-medium"
-            >
-              Contact Support
-            </a>
-          </p>
         </div>
       </div>
     </div>

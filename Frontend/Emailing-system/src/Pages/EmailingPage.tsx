@@ -319,12 +319,14 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                   <Mail className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="text-xl font-medium text-gray-900">MailHub</h1>
+                <h1 className="text-xl font-medium text-gray-900">
+                  Deped Cadiz
+                </h1>
               </div>
             </div>
 
             {/* Search Bar (Gmail-style) */}
-            <div className="flex-1 max-w-2xl mx-8">
+            {/* <div className="flex-1 max-w-2xl mx-8">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -334,7 +336,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
                 />
                 <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
               </div>
-            </div>
+            </div> */}
 
             <div className="flex items-center space-x-2">
               {currentUser && (

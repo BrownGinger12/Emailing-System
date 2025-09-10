@@ -17,7 +17,7 @@ def add_to_log(request):
     except ValidationError as e:
         return jsonify({"message": str(e)}), 400
     except Exception as e:
-        return jsonify({"message": str(e)}), 500
+        return jsonify({"message": "test"}), 500
 
 def delete_log(application_code):
     try:

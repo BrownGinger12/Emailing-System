@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "Waiting for MySQL..."
+echo "Waiting for MySQL... "$DB_HOST" "
 
 while ! mysqladmin ping -h"$DB_HOST" --silent; do
     sleep 2
