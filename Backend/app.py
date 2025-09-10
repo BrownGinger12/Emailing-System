@@ -6,6 +6,7 @@ from Handler.Attachment_Handler import *
 from Handler.Log_Handler import *
 import os
 from Handler.excel_handler import *
+from flask_cors import CORS
 
 mail = Mail()
 
@@ -14,6 +15,7 @@ def create_app():
     app.config.from_object(Config)
 
     mail.init_app(app)
+    CORS(app)
 
     return app
 
@@ -29,6 +31,7 @@ def send_email():
         name = data.get('name')
         sex = data.get('sex')
         recipient = data.get('recipient')
+        qualification = data.get('qualification')
 
         resp = generate_attachment(request)
         output_path = "Emails/Output/Output.docx"
@@ -36,7 +39,7 @@ def send_email():
         if resp['statusCode'] == 500:
             return jsonify({'error': resp['message']}), 500
 
-        email = Email(position=position, name=name, sex=sex)
+        email = Email(position=position, name=name, sex=sex, qualification=qualification)
         body = email.generate_email()
 
         subject = f"Initial Evaluation Result: {position} - {application_code}"

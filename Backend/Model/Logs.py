@@ -6,17 +6,18 @@ class Log(BaseModel):
     name: str = Field(..., description="Full name of the recipient (without last name)")
     email: str = Field(..., description="Email of the recipient")
     position: str = Field(..., description="Position applied for")
+    remarks: str = Field(..., description="Remarks")
 
     def create(self):
         try:
             response = query(
                             """
                             INSERT INTO emails (
-                                application_code, name, email, position
-                            ) VALUES (%s, %s, %s, %s)
+                                application_code, name, email, position, remarks
+                            ) VALUES (%s, %s, %s, %s, %s)
                             """,
                             (
-                                self.application_code, self.name, self.email, self.position
+                                self.application_code, self.name, self.email, self.position, self.remarks
                             )
                         )
 

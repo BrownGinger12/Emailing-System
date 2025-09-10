@@ -4,14 +4,17 @@ import json
 def parse_excel_to_json(file_path):
     # Load Excel file and sheet
     df = pd.read_excel(file_path, sheet_name='KINDER QUALIFIED', header=None)
+    value = df.iloc[8, 4]
+    cleaned_value = value.replace("POSITION: ", "").strip()
 
     # Extract header information (optional)
     header_info = {
-        "position": df.iloc[8, 1],
+        "position": value,
         "education_required": df.iloc[12, 4],
         "training_required": df.iloc[13, 4],
         "experience_required": df.iloc[14, 4],
-        "eligibility_required": df.iloc[15, 4]
+        "eligibility_required": df.iloc[15, 4],
+        "performance_required": df.iloc[17, 4]
     }
 
     # Combine header rows (row 15 & 16)
@@ -29,7 +32,7 @@ def parse_excel_to_json(file_path):
             combined_headers.append("")
 
     # Load actual data from row 17 onward
-    data = df.iloc[20:].reset_index(drop=True)
+    data = df.iloc[21:].reset_index(drop=True)
     data.columns = combined_headers
 
     # Extract only the needed columns by index
@@ -46,6 +49,11 @@ def parse_excel_to_json(file_path):
         'experience_years': data.iloc[:, 18],
         'eligibility': data.iloc[:, 19],
         'remarks': data.iloc[:, 20],
+        'performance': data.iloc[:, 21],
+        'education_remarks': data.iloc[:, 22],
+        'experience_remarks': data.iloc[:, 23],
+        'training_remarks': data.iloc[:, 24],
+        'eligibility_remarks': data.iloc[:, 25],
     })
 
     # Drop fully empty rows
@@ -53,10 +61,13 @@ def parse_excel_to_json(file_path):
 
     combined_data = []
     for _, row in extracted_data.iterrows():
-        applicant_data = row.to_dict()
+    # Convert row to dict and replace NaN with ""
+        applicant_data = {k: ("" if pd.isna(v) else v) for k, v in row.to_dict().items()}
         applicant_data.update(header_info)
         combined_data.append(applicant_data)
 
-    # Convert to JSON
+
     json_output = combined_data
+
+    print("JSON Output:", json_output)  # Debugging line to check the output
     return json_output 

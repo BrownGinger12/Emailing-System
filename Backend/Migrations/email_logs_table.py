@@ -12,6 +12,7 @@ def create_emails_table():
                     name VARCHAR(255),
                     email VARCHAR(255),
                     position VARCHAR(255),
+                    remarks VARCHAR(255),
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)

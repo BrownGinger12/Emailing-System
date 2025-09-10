@@ -20,6 +20,14 @@ class Attachment(BaseModel):
     training: str
     eligibility_required: str
     eligibility: str
+    education_remarks: str
+    experience_remarks: str
+    training_remarks: str
+    eligibility_remarks: str
+    performance_required: str
+    performance: str
+    remarks: str
+
 
     def generate_docx(self, template_path: str, output_path: str):
         try:
@@ -31,7 +39,7 @@ class Attachment(BaseModel):
                 "[LastName]": self.last_name,
                 "[Street]": self.street,
                 "[City]": self.city,
-                "[Name]": self.name,
+                "[Name]": f"{self.name} {self.last_name}",
                 "[Position]": self.position,
                 "[Education Required]": self.education_required,
                 "[Education]": self.education,
@@ -41,6 +49,13 @@ class Attachment(BaseModel):
                 "[Training]": self.training,
                 "[Eligibility Required]": self.eligibility_required,
                 "[Eligibility]": self.eligibility,
+                "[Education Remarks]": self.education_remarks,
+                "[Experience Remarks]": self.experience_remarks,
+                "[Training Remarks]": self.training_remarks,
+                "[Eligibility Remarks]": self.eligibility_remarks,
+                "[Performance Required]": self.performance_required,
+                "[Performance]": self.performance,
+                "[Remarks]": self.remarks,
             }
 
             for paragraph in doc.paragraphs:
