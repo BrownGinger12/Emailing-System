@@ -1,11 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../Firebase/firebase";
+
+interface User {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+}
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  logout: () => Promise<void>;
+  login: (user: User) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,42 +32,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Initialize from localStorage on mount
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-
-      // Save to localStorage
-      if (user) {
-        localStorage.setItem(
-          "authUser",
-          JSON.stringify({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-          })
-        );
-      } else {
+    const storedUser = localStorage.getItem("authUser");
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setCurrentUser(userData as User);
+      } catch (error) {
+        console.error("Error parsing stored user:", error);
         localStorage.removeItem("authUser");
       }
-    });
-
-    return unsubscribe;
+    }
+    setLoading(false);
   }, []);
 
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      localStorage.removeItem("authUser");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+  const login = (user: User) => {
+    setCurrentUser(user);
+    localStorage.setItem("authUser", JSON.stringify(user));
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("authUser");
   };
 
   const value = {
     currentUser,
     loading,
+    login,
     logout,
   };
 

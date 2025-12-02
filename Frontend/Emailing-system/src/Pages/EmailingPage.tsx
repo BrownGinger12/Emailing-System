@@ -8,13 +8,8 @@ import {
   Users,
   Trash2,
   Inbox,
-  Search,
   Archive,
-  Star,
-  MoreHorizontal,
-  Filter,
   RefreshCw,
-  Menu,
   LogOut,
 } from "lucide-react";
 import axiosClient from "../axiosClient";
@@ -204,7 +199,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
       };
       try {
         const response = await axiosClient.post("/send-email", payload);
-        const respLogs = await axiosClient.post("/add_to_log", payloadLogs);
+        await axiosClient.post("/add_to_log", payloadLogs);
         console.log("✅ Response:", response.data);
       } catch (error: unknown) {
         const err = error as AxiosError<{ error: string }>;
@@ -692,7 +687,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredLogs.length > 0 ? (
-                        filteredLogs.map((log, index) => (
+                        filteredLogs.map((log) => (
                           <tr
                             key={log.id}
                             className="hover:bg-gray-50 transition-colors"
