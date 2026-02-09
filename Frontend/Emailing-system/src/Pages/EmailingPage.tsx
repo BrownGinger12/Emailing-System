@@ -13,7 +13,7 @@ import {
   LogOut,
 } from "lucide-react";
 import axiosClient from "../axiosClient";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { useAuth } from "../contexts/AuthContext";
 // Note: axiosClient and AxiosError imports should be available in your project
 // import axiosClient from "../axiosClient";
@@ -134,13 +134,13 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
     setIsSending(true);
     setSendingProgress(0);
 
-    // Create a copy of recipients to work with
     const recipientsCopy = [...recipients];
+    let emailFailed = 0;
 
-    // Simulate sending emails with progress and remove recipients as they're sent
     for (let i = 0; i < recipientsCopy.length; i++) {
       const recipient = recipientsCopy[i];
       const recipientData = rawExcelData[i];
+
       setCurrentSendingEmail(recipient.email);
 
       const payloadLogs = {
@@ -197,19 +197,45 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
         performance: recipientData.performance,
         performance_required: recipientData.performance_required,
       };
+
       try {
         const response = await axiosClient.post("/send-email", payload);
+
+        // Axios only reaches here for 2xx
         await axiosClient.post("/add_to_log", payloadLogs);
-        console.log("✅ Response:", response.data);
+
+        console.log(
+          `✅ Email sent to ${recipient.email} (status ${response.status})`
+        );
       } catch (error: unknown) {
-        const err = error as AxiosError<{ error: string }>;
-        if (err.response) {
-          console.error("❌ Error:", err.response.data.error);
+        emailFailed += 1;
+
+        if (axios.isAxiosError(error)) {
+          console.error("❌ Email send failed", {
+            email: recipient.email,
+            status: error.response?.status,
+            message:
+              error.response?.data?.error ||
+              error.response?.data?.message ||
+              error.message,
+            data: error.response?.data,
+          });
+
+          // Optional: stop on auth errors
+          if (
+            error.response?.status === 401 ||
+            error.response?.status === 403
+          ) {
+            alert("Authentication error. Sending stopped.");
+            break;
+          }
         } else {
-          console.error("❌ Error:", err.message);
+          console.error("❌ Unknown error:", error);
         }
       } finally {
-        setRecipients((prev) => prev.filter((_, index) => index !== 0));
+        // Remove first recipient safely
+        setRecipients((prev) => prev.slice(1));
+
         const progress = ((i + 1) / recipientsCopy.length) * 100;
         setSendingProgress(progress);
       }
@@ -218,8 +244,13 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
     setIsSending(false);
     setSendingProgress(0);
     setCurrentSendingEmail("");
-    alert(`Successfully sent ${recipientsCopy.length} emails!`);
-    // Clear file input and reset states
+
+    alert(
+      `Successfully sent ${
+        recipientsCopy.length - emailFailed
+      } emails. Failed: ${emailFailed}`
+    );
+
     if (fileInputRef.current) fileInputRef.current.value = "";
     setRecipients([]);
     setRawExcelData([]);

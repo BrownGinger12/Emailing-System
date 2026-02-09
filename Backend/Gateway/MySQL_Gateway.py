@@ -1,9 +1,8 @@
-import mysql.connector
+import pymysql
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
 
 host = os.getenv("DB_HOST")
 user = os.getenv("DB_USER")
@@ -12,46 +11,47 @@ database = os.getenv("DB_NAME")
 
 
 def get_connection():
-    return mysql.connector.connect(
+    return pymysql.connect(
         host=host,
         user=user,
         password=password,
-        database=database
+        database=database,
+        cursorclass=pymysql.cursors.DictCursor,
+        autocommit=True
     )
 
+
 def query(sql, params=None):
-    db = get_connection()
-    cursor = db.cursor(dictionary=True)
+    conn = get_connection()
+    cursor = conn.cursor()
     try:
         cursor.execute(sql, params)
-        db.commit()
         return {"statusCode": 200, "message": "Query executed successfully"}
-    except mysql.connector.Error as err:
-        return {"statusCode": 500, "message": err.msg}
+    except Exception as err:
+        return {"statusCode": 500, "message": str(err)}
     finally:
         cursor.close()
-        db.close()
-    
+        conn.close()
+
 
 def fetch(table: str, conditions: dict = None):
+    conn = get_connection()
+    cursor = conn.cursor()
     try:
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        query = f"SELECT * FROM {table}"
+        sql = f"SELECT * FROM `{table}`"
         values = []
 
         if conditions:
-            where_clause = " AND ".join([f"{col} = %s" for col in conditions])
-            query += f" WHERE {where_clause}"
+            where_clause = " AND ".join([f"`{col}` = %s" for col in conditions])
+            sql += f" WHERE {where_clause}"
             values = list(conditions.values())
 
-        cursor.execute(query, values)
-        results = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return results
+        cursor.execute(sql, values)
+        return cursor.fetchall()
 
-    except mysql.connector.Error as err:
+    except Exception as err:
         print(f"Error: {err}")
         return []
+    finally:
+        cursor.close()
+        conn.close()
