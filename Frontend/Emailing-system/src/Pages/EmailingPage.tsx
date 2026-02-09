@@ -13,7 +13,7 @@ import {
   LogOut,
 } from "lucide-react";
 import axiosClient from "../axiosClient";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 // Note: axiosClient and AxiosError imports should be available in your project
 // import axiosClient from "../axiosClient";
@@ -82,7 +82,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
   const handleDeleteLog = (application_id: string) => {
     if (confirm("Are you sure you want to delete this email log?")) {
       const updatedLogs = emailLogs.filter(
-        (log) => log.application_code !== application_id
+        (log) => log.application_code !== application_id,
       );
       setEmailLogs(updatedLogs);
       deleteLog(application_id);
@@ -90,7 +90,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
   };
 
   const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -123,7 +123,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
       setTotalRecipientsCount(mappedRecipients.length);
     } catch (error) {
       alert(
-        "Error uploading Excel file. Please ensure it contains an email column."
+        "Error uploading Excel file. Please ensure it contains an email column.",
       );
     } finally {
       setIsUploading(false);
@@ -205,7 +205,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
         await axiosClient.post("/add_to_log", payloadLogs);
 
         console.log(
-          `✅ Email sent to ${recipient.email} (status ${response.status})`
+          `✅ Email sent to ${recipient.email} (status ${response.status})`,
         );
       } catch (error: unknown) {
         emailFailed += 1;
@@ -248,7 +248,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
     alert(
       `Successfully sent ${
         recipientsCopy.length - emailFailed
-      } emails. Failed: ${emailFailed}`
+      } emails. Failed: ${emailFailed}`,
     );
 
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -746,7 +746,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
                                     month: "short",
                                     day: "numeric",
                                     timeZone: "Asia/Manila",
-                                  }
+                                  },
                                 )}
                               </div>
                               <div className="text-xs text-gray-400">
@@ -757,7 +757,7 @@ const MailingDashboard: React.FC<MailingDashboardProps> = () => {
                                     minute: "2-digit",
                                     hour12: true,
                                     timeZone: "Asia/Manila",
-                                  }
+                                  },
                                 )}
                               </div>
                             </td>
