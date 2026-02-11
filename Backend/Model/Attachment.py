@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from docx import Document
 import os
+from typing import Optional
 
 
 class Attachment(BaseModel):
@@ -13,22 +14,33 @@ class Attachment(BaseModel):
     name: str = Field(..., description="Full name of the recipient (without last name)")
     position: str = Field(..., description="Position applied for")
 
-    education_required: str = ""
-    education: str = ""
-    experience_required: str = ""
-    experience: str = ""
-    training_required: str = ""
-    training: str = ""
-    eligibility_required: str = ""
-    eligibility: str = ""
-    education_remarks: str = ""
-    experience_remarks: str = ""
-    training_remarks: str = ""
-    eligibility_remarks: str = ""
-    performance_required: str = ""
-    performance: str = ""
-    remarks: str = ""
+    # Optional fields with default empty string
+    education_required: Optional[str] = ""
+    education: Optional[str] = ""
+    experience_required: Optional[str] = ""
+    experience: Optional[str] = ""
+    training_required: Optional[str] = ""
+    training: Optional[str] = ""
+    eligibility_required: Optional[str] = ""
+    eligibility: Optional[str] = ""
+    education_remarks: Optional[str] = ""
+    experience_remarks: Optional[str] = ""
+    training_remarks: Optional[str] = ""
+    eligibility_remarks: Optional[str] = ""
+    performance_required: Optional[str] = ""
+    performance: Optional[str] = ""
+    remarks: Optional[str] = ""
 
+    # Validator to convert None → ""
+    @validator(
+        "education_required", "education", "experience_required", "experience",
+        "training_required", "training", "eligibility_required", "eligibility",
+        "education_remarks", "experience_remarks", "training_remarks",
+        "eligibility_remarks", "performance_required", "performance", "remarks",
+        pre=True, always=True
+    )
+    def none_to_empty(cls, v):
+        return v or ""
 
     def generate_docx(self, template_path: str, output_path: str):
         try:
@@ -72,7 +84,6 @@ class Attachment(BaseModel):
                                 cell.text = cell.text.replace(placeholder, value)
             
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
             doc.save(output_path)
 
             return {"message": "Doc generated", "statusCode": 200}
