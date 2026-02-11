@@ -3,7 +3,7 @@ import json
 
 def parse_excel_to_json(file_path):
     # Load Excel file and sheet
-    df = pd.read_excel(file_path, sheet_name='KINDER QUALIFIED', header=None)
+    df = pd.read_excel(file_path, header=None)
     value = df.iloc[8, 4]
     cleaned_value = value.replace("POSITION: ", "").strip()
 
