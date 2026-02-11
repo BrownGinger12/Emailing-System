@@ -13,21 +13,21 @@ class Attachment(BaseModel):
     name: str = Field(..., description="Full name of the recipient (without last name)")
     position: str = Field(..., description="Position applied for")
 
-    education_required: str
-    education: str
-    experience_required: str
-    experience: str
-    training_required: str
-    training: str
-    eligibility_required: str
-    eligibility: str
-    education_remarks: str
-    experience_remarks: str
-    training_remarks: str
-    eligibility_remarks: str
-    performance_required: str
-    performance: str
-    remarks: str
+    education_required: str = ""
+    education: str = ""
+    experience_required: str = ""
+    experience: str = ""
+    training_required: str = ""
+    training: str = ""
+    eligibility_required: str = ""
+    eligibility: str = ""
+    education_remarks: str = ""
+    experience_remarks: str = ""
+    training_remarks: str = ""
+    eligibility_remarks: str = ""
+    performance_required: str = ""
+    performance: str = ""
+    remarks: str = ""
 
 
     def generate_docx(self, template_path: str, output_path: str):

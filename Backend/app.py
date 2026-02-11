@@ -174,6 +174,7 @@ def send_email():
         return jsonify({'message': 'Email sent successfully and saved to Sent folder'})
 
     except Exception as e:
+        print(str(e))
         return jsonify({'error': str(e)}), 500
 
 @app.route('/upload-excel', methods=['POST'])
